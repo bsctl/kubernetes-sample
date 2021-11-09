@@ -11,7 +11,7 @@ metadata:
     name: block00
 spec:
   capacity:
-    storage: 3Gi
+    storage: 123Gi
   storageClassName: manual
   accessModes:
   - ReadWriteOnce

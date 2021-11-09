@@ -16,7 +16,7 @@ spec:
   securityContext:
     fsGroup: 1001
   initContainers:
-  - name: initializer
+  - name: init1
     image: bsctl/git:latest
     imagePullPolicy: IfNotPresent
     volumeMounts:

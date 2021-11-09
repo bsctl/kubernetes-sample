@@ -5,6 +5,7 @@ metadata:
   namespace:
   labels:
     run: nginx
+    app: web
 spec:
   containers:
   - name: nginx

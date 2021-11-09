@@ -8,7 +8,7 @@ data:
   nginx.conf: |
     server {
         listen       80;
-        server_name facebook.com;
+        server_name google.com;
         location / {
             root   /usr/share/nginx/html;
             index  index.html index.htm home.html;

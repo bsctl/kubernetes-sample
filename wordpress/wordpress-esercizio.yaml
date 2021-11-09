@@ -1,0 +1,139 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  labels:
+  namespace:
+  name: mariadb
+spec:
+  replicas: 1 # <<< Singleton!!!
+  selector:
+    matchLabels:
+      run: mariadb
+  template:
+    metadata:
+      labels:
+        run: mariadb
+    spec:
+      containers:
+      - image: bitnami/mariadb:latest
+        name: mariadb
+        ports:
+        - containerPort: 3306
+          protocol: TCP
+        env:
+        - name: MARIADB_ROOT_PASSWORD
+          value: bitnami123
+        - name: MARIADB_DATABASE
+          value: wordpress
+        - name: MARIADB_USER
+          value: bitnami
+        - name: MARIADB_PASSWORD
+          value: bitnami123
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mariadb
+  labels:
+spec:
+  ports:
+  - protocol: TCP
+    port: 3306
+    targetPort: 3306
+  selector:
+    run: mariadb
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  labels:
+  namespace:
+  name: wordpress
+spec:
+  replicas: 1 # <<< Singleton!!!
+  selector:
+    matchLabels:
+      run: wordpress
+  template:
+    metadata:
+      labels:
+        run: wordpress
+    spec:
+      containers:
+      - image: bitnami/wordpress:latest
+        name: wordpress
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        - containerPort: 8443
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 120
+          timeoutSeconds: 20
+          periodSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 20
+          periodSeconds: 10
+          failureThreshold: 3
+        env:
+        - name: MARIADB_HOST
+          value: mariadb
+        - name: MARIADB_PORT_NUMBER
+          value: '3306'
+        - name: WORDPRESS_DATABASE_NAME
+          value: wordpress
+        - name: WORDPRESS_DATABASE_USER
+          value: bitnami
+        - name: WORDPRESS_DATABASE_PASSWORD
+          value: bitnami123
+        - name: WORDPRESS_USERNAME # login page /wp-login.php
+          value: admin
+        - name: WORDPRESS_PASSWORD
+          value: password
+        - name: WORDPRESS_BLOG_NAME
+          value: Adriano's Blog
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress
+  labels:
+    run: wordpress
+spec:
+  ports:
+  - protocol: TCP
+    name: http
+    port: 80
+    targetPort: 8080
+  - protocol: TCP
+    name: https
+    port: 443
+    targetPort: 8443
+  selector:
+    run: wordpress
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: wordpress
+spec:
+  rules:
+  - host: adriano.training.clastix.io
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: wordpress 
+          servicePort: 80

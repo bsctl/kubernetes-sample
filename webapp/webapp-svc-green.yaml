@@ -13,5 +13,4 @@ spec:
   selector:
     run: webapp
     version: v2.0.0
-  type: LoadBalancer
-  sessionAffinity: None
+  type: ClusterIP
