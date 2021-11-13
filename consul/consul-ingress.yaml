@@ -2,17 +2,15 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: consul-ui
+  annotations:
+    kubernetes.io/ingress.class: addon-http-application-routing
 spec:
   rules:
-  - host: consul.training.clastix.io
+  - host: consul.aks.clastix.io
     http:
       paths:
       - path: /
         backend:
           serviceName: consul
           servicePort: 8500
-      - path: /metrics
-        backend:
-          serviceName: consul-metrics
-          servicePort: 9107
 

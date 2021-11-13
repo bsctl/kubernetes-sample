@@ -14,3 +14,4 @@ spec:
   selector:
     run: nginx
   type: LoadBalancer
+  loadBalancerIP: 192.168.30.200

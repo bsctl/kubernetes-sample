@@ -15,9 +15,6 @@ spec:
       labels:
         run: webapp
         version: v1.0.0
-      annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "9090"
     spec:
       containers:
       - image: bsctl/go-web-app:latest

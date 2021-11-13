@@ -147,16 +147,32 @@ spec:
     targetPort: 8443
   selector:
     run: blog
-  type: LoadBalancer
+  type: ClusterIP
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: mariadb-pvc
 spec:
-  #storageClassName: ebs-sc
+  #storageClassName: azurefile
   accessModes:
   - ReadWriteOnce
   resources:
     requests:
       storage: 12Gi
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: wordpress
+  annotations:
+    kubernetes.io/ingress.class: addon-http-application-routing
+spec:
+  rules:
+  - host: blog.aks.clastix.io
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: wordpress 
+          servicePort: 80
